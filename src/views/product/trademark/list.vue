@@ -1,6 +1,8 @@
 <template>
   <div>
-    <el-button type="primary" icon="el-icon-plus">添加</el-button>
+    <el-button type="primary" @click="visible = true" icon="el-icon-plus"
+      >添加</el-button
+    >
     <el-table
       :data="trademarkList"
       border
@@ -41,6 +43,47 @@
       :total="total"
     >
     </el-pagination>
+
+    <el-dialog
+      title="添加品牌"
+      :visible.sync="visible"
+      width="30%"
+      :before-close="handleClose"
+    >
+      <el-form
+        :model="trademarkForm"
+        :rules="rules"
+        ref="trademarkForm"
+        label-width="100px"
+      >
+        <el-form-item label="品牌名称" prop="tmName">
+          <el-input v-model="trademarkForm.tmName"></el-input>
+        </el-form-item>
+        <el-form-item label="品牌LOGo" prop="logoUrl">
+          <el-upload
+            class="avatar-uploader"
+            action="https://jsonplaceholder.typicode.com/posts/"
+            :show-file-list="false"
+            :on-success="handleAvatarSuccess"
+            :before-upload="beforeAvatarUpload"
+          >
+            <img
+              v-if="trademarkForm.logoUrl"
+              :src="trademarkForm.logoUrl"
+              class="avatar"
+            />
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
+          <span>只能上传jpg/png文件,且不超过50kb</span>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="visible = false">取 消</el-button>
+        <el-button type="primary" @click="submitForm('trademarkForm')"
+          >确 定</el-button
+        >
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -53,9 +96,35 @@ export default {
       total: 0, //总数
       page: 1, //页码
       limit: 3, //每页显示条数
+      visible: false, //上传图片开关显示
+      trademarkForm: {
+        tmName: '',
+        logoUrl: '',
+      },
+      rules: {
+        tmName: [
+          { required: true, message: '请输入品牌名称', trigger: 'blur' },
+        ],
+        logoUrl: [{ required: true, message: '请输入品牌LOGO' }],
+      },
     };
   },
   methods: {
+    //提交表单
+    submitForm(form) {
+      //校验表单
+      this.$refs[form].validate((valid) => {
+        if (valid) {
+          //表单校验通过
+          console.log(this.trademarkForm);
+        }
+      });
+    },
+    //上传图片成功的回调
+    handleAvatarSuccess() {},
+    //上传图片之前触发的回调
+    beforeAvatarUpload() {},
+
     //改变的是每页条数
     handleSizeChange(limit) {
       //page是之前的page limit是传过来的limit
@@ -96,11 +165,35 @@ export default {
   },
 };
 </script>
-<style lang="sass">
+<style lang="sass" scoped>
 .trademark-img
-  width: 100px
+  width: 150px
+
 .trademark-pagination
   text-align: right
-.el-pagination__sizes
+
+>>>.el-pagination__sizes
   margin-left: 250px
+
+>>>.avatar-uploader .el-upload
+  border: 1px dashed #d9d9d9
+  border-radius: 6px
+  cursor: pointer
+  position: relative
+  overflow: hidden
+  &:hover
+    border-color: #409EFF
+
+>>>.avatar-uploader-icon
+  font-size: 28px
+  color: #8c939d
+  width: 178px
+  height: 178px
+  line-height: 178px
+  text-align: center
+
+>>>.avatar
+  width: 178px
+  height: 178px
+  display: block
 </style>
