@@ -7,7 +7,7 @@ export default ({
   getPageList (page, limit) {
     return request({
       method: 'GET',
-      url: `${api_name}/${page}/${limit}`
+      url: `${api_name}/${page}/${limit}`,
     })
   },
   //新增品牌
