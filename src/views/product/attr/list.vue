@@ -1,40 +1,35 @@
 <template>
   <div>
-    <el-card>
-      <el-form inline :model="category">
-        <el-form-item label="一级分类">
-          <el-select v-model="category.category1Id" placeholder="请选择">
-            <el-option label="区域一" value="category1Id"></el-option>
-            <el-option label="区域二" value="beijing"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="二级分类">
-          <el-select v-model="category.category2Id" placeholder="请选择">
-            <el-option label="区域一" value="category2Id"></el-option>
-            <el-option label="区域二" value="beijing"></el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="三级分类">
-          <el-select v-model="category.category3Id" placeholder="请选择">
-            <el-option label="区域一" value="category3Id"></el-option>
-            <el-option label="区域二" value="beijing"></el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-    </el-card>
-
+    <Category @change="getAttrList" />
     <el-card style="margin-top: 20px">
       <el-button type="primary" icon="el-icon-plus">添加</el-button>
       <el-table :data="attrList" border style="width: 100%; margin: 20px 0">
         <el-table-column type="index" label="序号" width="80" align="center">
         </el-table-column>
-        <el-table-column prop="tmName" label="属性名称" width="150">
+        <el-table-column prop="attrName" label="属性名称" width="150">
         </el-table-column>
-        <el-table-column label="属性值列表"> </el-table-column>
+        <el-table-column label="属性值列表">
+          <template v-slot="{ row }">
+            <el-tag
+              style="margin-left: 5px"
+              v-for="attrVal in row.attrValueList"
+              :key="attrVal.id"
+              >{{ attrVal.valueName }}</el-tag
+            >
+          </template>
+        </el-table-column>
         <el-table-column label="操作" width="150">
           <template>
-            <el-button type="warning" icon="el-icon-edit">修改</el-button>
-            <el-button type="danger" icon="el-icon-delete">删除</el-button>
+            <el-button
+              type="warning"
+              icon="el-icon-edit"
+              size="mini"
+            ></el-button>
+            <el-button
+              type="danger"
+              icon="el-icon-delete"
+              size="mini"
+            ></el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -42,18 +37,41 @@
   </div>
 </template>
 
+
 <script>
+/*
+0:Object
+attrName:"言情小说"
+attrValueList:Array[4]
+0:Object
+attrId:3559
+id:19660
+valueName:"我与富婆不得不说的二三事"
+1:Object
+2:Object
+3:Object
+categoryId:1
+categoryLevel:3
+id:3559
+*/
+import { methods } from 'v-charts/lib/core';
+import Category from './category';
 export default {
   name: 'AttrList',
   data() {
     return {
-      category: {
-        category1Id: '',
-        category2Id: '',
-        category3Id: '',
-      },
       attrList: [],
     };
+  },
+  //绑定的自定义事件
+  methods: {
+    getAttrList(attrList) {
+      this.attrList = attrList;
+    },
+  },
+
+  components: {
+    Category,
   },
 };
 </script>
