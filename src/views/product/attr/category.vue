@@ -70,6 +70,10 @@ export default {
   methods: {
     //请求getCategorys2
     async handleSelectChange1(category1Id) {
+      this.category2List = [];
+      this.category3List = [];
+      this.category.category2Id = '';
+      this.category.category3Id = '';
       const result = await this.$API.attrs.getCategorys2(category1Id);
       if (result.code === 200) {
         this.category2List = result.data;
@@ -79,6 +83,8 @@ export default {
     },
     //请求getCategorys3
     async handleSelectChange2(category2Id) {
+      this.category3List = [];
+      this.category.category3Id = '';
       const result = await this.$API.attrs.getCategorys3(category2Id);
       if (result.code === 200) {
         this.category3List = result.data;
