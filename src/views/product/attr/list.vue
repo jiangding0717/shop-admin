@@ -1,8 +1,8 @@
 <template>
   <div>
     <Category @change="getAttrList" />
-    <el-card style="margin-top: 20px">
-      <el-button type="primary" icon="el-icon-plus">添加</el-button>
+    <el-card style="margin-top: 20px" v-show="isShowList">
+      <el-button type="primary" icon="el-icon-plus">添加属性</el-button>
       <el-table :data="attrList" border style="width: 100%; margin: 20px 0">
         <el-table-column type="index" label="序号" width="80" align="center">
         </el-table-column>
@@ -19,8 +19,9 @@
           </template>
         </el-table-column>
         <el-table-column label="操作" width="150">
-          <template>
+          <template v-slot="{ row }">
             <el-button
+              @click="update(row)"
               type="warning"
               icon="el-icon-edit"
               size="mini"
@@ -33,6 +34,44 @@
           </template>
         </el-table-column>
       </el-table>
+    </el-card>
+
+    <el-card v-show="!isShowList" style="margin-top: 20px">
+      <el-form :model="attr" inline>
+        <el-form-item label="属性名" prop="attrName">
+          <el-input v-model="attr.attrName"></el-input>
+        </el-form-item>
+      </el-form>
+      <el-button type="primary" icon="el-icon-plus">添加属性</el-button>
+      <el-table
+        :data="attr.attrValueList"
+        border
+        style="width: 100%; margin: 20px 0"
+      >
+        <el-table-column
+          type="index"
+          label="序号1111"
+          width="80"
+          align="center"
+        >
+        </el-table-column>
+        <el-table-column label="属性值名称">
+          <template v-slot="{ row }">
+            <span>{{ row.valueName }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作aaaaa">
+          <template>
+            <el-button
+              type="warning"
+              icon="el-icon-delete"
+              size="mini"
+            ></el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-button type="primary">保存</el-button>
+      <el-button>取消</el-button>
     </el-card>
   </div>
 </template>
@@ -61,10 +100,22 @@ export default {
   data() {
     return {
       attrList: [],
+      isShowList: true,
+      attr: {
+        attrName: '',
+        attrValueList: [],
+      },
     };
   },
   //绑定的自定义事件
   methods: {
+    update(attr) {
+      this.attr = {
+        ...attr,
+      };
+      this.isShowList = false;
+    },
+
     getAttrList(attrList) {
       this.attrList = attrList;
     },
