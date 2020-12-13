@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Category @change="getAttrList" />
+    <Category @change="getAttrList" :disabled="!isShowList" />
     <el-card style="margin-top: 20px" v-show="isShowList">
       <el-button type="primary" icon="el-icon-plus">添加属性</el-button>
       <el-table :data="attrList" border style="width: 100%; margin: 20px 0">
@@ -30,6 +30,7 @@
               type="danger"
               icon="el-icon-delete"
               size="mini"
+              @click="del(row)"
             ></el-button>
           </template>
         </el-table-column>
@@ -42,7 +43,9 @@
           <el-input v-model="attr.attrName"></el-input>
         </el-form-item>
       </el-form>
-      <el-button type="primary" icon="el-icon-plus"></el-button>
+      <el-button type="primary" icon="el-icon-plus" @click="addAttrValue"
+        >添加属性值</el-button
+      >
       <el-table
         :data="attr.attrValueList"
         border
@@ -56,13 +59,13 @@
         >
         </el-table-column>
         <el-table-column label="属性值名称">
-          <template v-slot="{ row }">
+          <template v-slot="{ row, $index }">
             <el-input
               size="mini"
               v-if="row.edit"
               v-model="row.valueName"
-              @blur="row.edit = false"
-              @keyup.enter.native="row.edit = false"
+              @blur="editComplted(row, $index)"
+              @keyup.enter.native="editComplted(row, $index)"
               antofocus
               ref="input"
             ></el-input>
@@ -79,17 +82,23 @@
           </template>
         </el-table-column>
         <el-table-column label="操作aaaaa">
-          <template>
-            <el-button
-              type="warning"
-              icon="el-icon-delete"
-              size="mini"
-            ></el-button>
+          <template v-slot="{ row, $index }">
+            <el-popconfirm
+              :title="`确定删除吗？${row.valueName}`"
+              @onConfirm="delAttrValue($index)"
+            >
+              <el-button
+                type="danger"
+                icon="el-icon-delete"
+                size="mini"
+                slot="reference"
+              ></el-button>
+            </el-popconfirm>
           </template>
         </el-table-column>
       </el-table>
-      <el-button type="primary">保存</el-button>
-      <el-button>取消</el-button>
+      <el-button type="primary" @click="save">保存</el-button>
+      <el-button @click="isShowList = true">取消</el-button>
     </el-card>
   </div>
 </template>
@@ -127,22 +136,76 @@ export default {
   },
   //绑定的自定义事件
   methods: {
+    //保存数据
+    async save() {
+      const result = await this.$API.attrs.saveAttrInfo(this.attr);
+      if (result.code === 200) {
+        this.$message.success('更新数据成功');
+        this.$API.attrs.saveAttrInfo(this.attr);
+        this.getAttrList(this.category);
+        this.isShowList = true;
+      } else {
+        this.$message.error(result.message);
+      }
+    },
+    //
+    editComplted(row, index) {
+      if (!row.valueName) {
+        this.attr.attrValueList.splice(index, 1);
+        return;
+      }
+      row.edit = false;
+    },
+    //删除属性值
+    delAttrValue(index) {
+      this.attr.attrValueList.splice(index, 1);
+    },
+    //添加属性值
+    addAttrValue() {
+      this.attr.attrValueList.push({ edit: true });
+      this.$nextTick(() => {
+        this.$refs.input.focus();
+      });
+    },
+    //删除属性
+    async del(row) {
+      if (window.confirm('确认删除?')) {
+        const result = await this.$API.attrs.deleteAttr(row.id);
+        if (result.code === 200) {
+          this.$message.success('数据删除成功');
+          this.getAttrList(this.category);
+        } else {
+          this.$message.error(result.message);
+        }
+      }
+    },
+
     edit(row) {
       this.$set(row, 'edit', true); //通过this.$set添加的属性才是响应式
+      /* $nextTick等Dom元素渲染完成在调用 */
       this.$nextTick(() => {
         this.$refs.input.focus(); //聚集焦点
       });
     },
-
+    //修改
     update(attr) {
-      this.attr = {
-        ...attr,
-      };
+      //浅度克隆
+      // this.attr = {
+      //   ...attr,
+      // };
+      //深度克隆
+      this.attr = JSON.parse(JSON.stringify(attr));
       this.isShowList = false;
     },
 
-    getAttrList(attrList) {
-      this.attrList = attrList;
+    async getAttrList(category) {
+      this.category = category;
+      const result = await this.$API.attrs.getAttrList(category);
+      if (result.code === 200) {
+        this.attrList = result.data;
+      } else {
+        this.$message.error(result.message);
+      }
     },
   },
 
