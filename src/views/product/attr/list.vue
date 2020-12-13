@@ -42,7 +42,7 @@
           <el-input v-model="attr.attrName"></el-input>
         </el-form-item>
       </el-form>
-      <el-button type="primary" icon="el-icon-plus">添加属性</el-button>
+      <el-button type="primary" icon="el-icon-plus"></el-button>
       <el-table
         :data="attr.attrValueList"
         border
@@ -57,7 +57,25 @@
         </el-table-column>
         <el-table-column label="属性值名称">
           <template v-slot="{ row }">
-            <span>{{ row.valueName }}</span>
+            <el-input
+              size="mini"
+              v-if="row.edit"
+              v-model="row.valueName"
+              @blur="row.edit = false"
+              @keyup.enter.native="row.edit = false"
+              antofocus
+              ref="input"
+            ></el-input>
+            <!-- antofocus聚集焦点 -->
+            <!-- 事件修饰符.native专门给组件绑定事件使用
+            会给组件中的第一个标签绑定相应的DOM事件
+             -->
+            <span
+              v-else
+              @click="edit(row)"
+              style="display: block; width: 100%"
+              >{{ row.valueName }}</span
+            >
           </template>
         </el-table-column>
         <el-table-column label="操作aaaaa">
@@ -109,6 +127,13 @@ export default {
   },
   //绑定的自定义事件
   methods: {
+    edit(row) {
+      this.$set(row, 'edit', true); //通过this.$set添加的属性才是响应式
+      this.$nextTick(() => {
+        this.$refs.input.focus(); //聚集焦点
+      });
+    },
+
     update(attr) {
       this.attr = {
         ...attr,
