@@ -79,6 +79,7 @@ export default {
       this.category3List = [];
       this.category.category2Id = '';
       this.category.category3Id = '';
+      this.$emit('clearList');
       const result = await this.$API.attrs.getCategorys2(category1Id);
       if (result.code === 200) {
         this.category2List = result.data;
@@ -90,6 +91,7 @@ export default {
     async handleSelectChange2(category2Id) {
       this.category3List = [];
       this.category.category3Id = '';
+      this.$emit('clearList')
       const result = await this.$API.attrs.getCategorys3(category2Id);
       if (result.code === 200) {
         this.category3List = result.data;

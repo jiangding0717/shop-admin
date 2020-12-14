@@ -1,8 +1,18 @@
 <template>
   <div>
-    <Category @change="getAttrList" :disabled="!isShowList" />
+    <Category
+      @change="getAttrList"
+      @clearList="clearList"
+      :disabled="!isShowList"
+    />
     <el-card style="margin-top: 20px" v-show="isShowList">
-      <el-button type="primary" icon="el-icon-plus">添加属性</el-button>
+      <el-button
+        type="primary"
+        icon="el-icon-plus"
+        :disabled="!category.category3Id"
+        @click="addShuXing"
+        >添加属性</el-button
+      >
       <el-table :data="attrList" border style="width: 100%; margin: 20px 0">
         <el-table-column type="index" label="序号" width="80" align="center">
         </el-table-column>
@@ -132,13 +142,35 @@ export default {
         attrName: '',
         attrValueList: [],
       },
+      category: { category1Id: '', category2Id: '', category3Id: '' },
     };
   },
   //绑定的自定义事件
   methods: {
+    //
+    clearList() {
+      //让数据为空
+      this.attr = [];
+      this.category.category3Id = ''; //禁用按钮
+    },
+    //添加属性
+    addShuXing() {
+      this.attr.attrValueList = [];
+      this.attr.attrName = '';
+      this.isShowList = false;
+    },
     //保存数据
     async save() {
-      const result = await this.$API.attrs.saveAttrInfo(this.attr);
+      // const result = await this.$API.attrs.saveAttrInfo(this.attr);
+      //判断是否添加
+      const isAdd = !this.attr.id;
+      const data = this.attr;
+      if (isAdd) {
+        data.categoryId = this.category.category3Id;
+        data.categoryLevel = 3;
+      }
+      //修改
+      const result = await this.$API.attrs.saveAttrInfo(data);
       if (result.code === 200) {
         this.$message.success('更新数据成功');
         this.$API.attrs.saveAttrInfo(this.attr);
