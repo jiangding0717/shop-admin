@@ -14,7 +14,7 @@ export default {
   name: 'SpuList',
   data() {
     return {
-      isShowList: false,
+      isShowList: true,
     };
   },
 

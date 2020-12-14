@@ -1,10 +1,13 @@
 <template>
   <div>
-    <Category
+    <!-- 自定义事件 -->
+    <!-- <Category
       @change="getAttrList"
       @clearList="clearList"
       :disabled="!isShowList"
-    />
+    /> -->
+    <!-- 换成全局事件总线 -->
+    <Category :disabled="!isShowList" />
     <el-card style="margin-top: 20px" v-show="isShowList">
       <el-button
         type="primary"
@@ -130,7 +133,8 @@ categoryId:1
 categoryLevel:3
 id:3559
 */
-import Category from './category';
+import Category from '@/components/Category';
+
 export default {
   name: 'AttrList',
   data() {
@@ -210,6 +214,7 @@ export default {
         if (result.code === 200) {
           this.$message.success('数据删除成功');
           this.getAttrList(this.category);
+          //更新数据
         } else {
           this.$message.error(result.message);
         }
@@ -244,7 +249,16 @@ export default {
       }
     },
   },
-
+  //触发全局自定义事件
+  mounted() {
+    this.$bus.$on('change', this.getAttrList);
+    this.$bus.$on('clearList', this.clearList);
+  },
+  //销毁全局自定义事件防止多次发送请求
+  beforeDestroy() {
+    this.$bus.$off('change', this.getAttrList);
+    this.$bus.$off('clearList', this.clearList);
+  },
   components: {
     Category,
   },
