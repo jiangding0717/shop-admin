@@ -130,7 +130,6 @@ categoryId:1
 categoryLevel:3
 id:3559
 */
-import { methods } from 'v-charts/lib/core';
 import Category from './category';
 export default {
   name: 'AttrList',
@@ -142,7 +141,11 @@ export default {
         attrName: '',
         attrValueList: [],
       },
-      category: { category1Id: '', category2Id: '', category3Id: '' },
+      category: {
+        category1Id: '',
+        category2Id: '',
+        category3Id: '',
+      },
     };
   },
   //绑定的自定义事件
@@ -150,7 +153,7 @@ export default {
     //
     clearList() {
       //让数据为空
-      this.attr = [];
+      this.attrList = [];
       this.category.category3Id = ''; //禁用按钮
     },
     //添加属性
@@ -158,6 +161,7 @@ export default {
       this.attr.attrValueList = [];
       this.attr.attrName = '';
       this.isShowList = false;
+      this.attr.id = '';
     },
     //保存数据
     async save() {
