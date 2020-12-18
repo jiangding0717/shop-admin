@@ -134,7 +134,7 @@ categoryLevel:3
 id:3559
 */
 import Category from '@/components/Category';
-
+import { mapState } from 'vuex';
 export default {
   name: 'AttrList',
   data() {
@@ -145,14 +145,33 @@ export default {
         attrName: '',
         attrValueList: [],
       },
-      category: {
-        category1Id: '',
-        category2Id: '',
-        category3Id: '',
-      },
+      // category: {
+      //   category1Id: '',
+      //   category2Id: '',
+      //   category3Id: '',
+      // },
     };
   },
   //绑定的自定义事件
+  computed: {
+    ...mapState({
+      category: (state) => state.category.category,
+    }),
+  },
+
+  watch: {
+    'category.category3Id'(category3Id) {
+      if (!category3Id) return;
+      this.getAttrList();
+    },
+    immediate: true, // 一上来触发一次
+    'category.category1Id'() {
+      this.clearList();
+    },
+    'category.category2Id'() {
+      this.clearList();
+    },
+  },
   methods: {
     //
     clearList() {
@@ -162,10 +181,9 @@ export default {
     },
     //添加属性
     addShuXing() {
-      this.attr.attrValueList = [];
-      this.attr.attrName = '';
       this.isShowList = false;
-      this.attr.id = '';
+      this.attr.attrName = '';
+      this.attr.attrValueList = [];
     },
     //保存数据
     async save() {
@@ -181,8 +199,8 @@ export default {
       const result = await this.$API.attrs.saveAttrInfo(data);
       if (result.code === 200) {
         this.$message.success('更新数据成功');
-        this.$API.attrs.saveAttrInfo(this.attr);
-        this.getAttrList(this.category);
+        // this.$API.attrs.saveAttrInfo(this.attr);
+        this.getAttrList();
         this.isShowList = true;
       } else {
         this.$message.error(result.message);
@@ -239,9 +257,9 @@ export default {
       this.isShowList = false;
     },
 
-    async getAttrList(category) {
-      this.category = category;
-      const result = await this.$API.attrs.getAttrList(category);
+    async getAttrList() {
+      // this.category = category;
+      const result = await this.$API.attrs.getAttrList(this.category);
       if (result.code === 200) {
         this.attrList = result.data;
       } else {
@@ -251,13 +269,13 @@ export default {
   },
   //触发全局自定义事件
   mounted() {
-    this.$bus.$on('change', this.getAttrList);
-    this.$bus.$on('clearList', this.clearList);
+    // this.$bus.$on('change', this.getAttrList);
+    // this.$bus.$on('clearList', this.clearList);
   },
   //销毁全局自定义事件防止多次发送请求
   beforeDestroy() {
-    this.$bus.$off('change', this.getAttrList);
-    this.$bus.$off('clearList', this.clearList);
+    // this.$bus.$off('change', this.getAttrList);
+    // this.$bus.$off('clearList', this.clearList);
   },
   components: {
     Category,

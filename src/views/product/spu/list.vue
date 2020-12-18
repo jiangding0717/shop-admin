@@ -1,8 +1,15 @@
 <template>
   <div>
-    <Category />
-    <SpuShowList v-if="isShowList" @showUpdateList="showUpdateList" />
-    <SpuUpdateList v-else :item="item" />
+    <SkuList v-if="isShowSkuList" :spuItem="spuItem" />
+    <div v-else>
+      <Category />
+      <SpuShowList
+        v-if="isShowList"
+        @showUpdateList="showUpdateList"
+        @showSpuList="showSpuList"
+      />
+      <SpuUpdateList v-else :item="item" @showList="showList" />
+    </div>
   </div>
 </template>
 
@@ -10,19 +17,33 @@
 import Category from '@/components/Category';
 import SpuShowList from './spuShowList';
 import SpuUpdateList from './spuUpdateList';
-import { methods } from 'v-charts/lib/core';
+import SkuList from './skuList';
 export default {
   name: 'SpuList',
   data() {
     return {
       isShowList: true,
       item: {},
+      isShowSkuList: false,
+      spuItem: {},
     };
   },
   methods: {
+    showSpuList(row) {
+      this.isShowSkuList = true;
+      this.spuItem = { ...row };
+    },
     showUpdateList(row) {
       this.isShowList = false;
       this.item = { ...row };
+    },
+
+    showList(category3Id) {
+      this.isShowList = true;
+      //等ShowList组件加载完成，在触发事件
+      // this.$nextTick(() => {
+      //   this.$bus.$emit('change', { category3Id });
+      // });
     },
   },
 
@@ -30,6 +51,7 @@ export default {
     Category,
     SpuShowList,
     SpuUpdateList,
+    SkuList,
   },
 };
 </script>

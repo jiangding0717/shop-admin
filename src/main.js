@@ -1,5 +1,5 @@
 import Vue from 'vue'
-
+import 'default-passive-events'
 // 引入专门的reset.css模块
 import 'normalize.css/normalize.css'
 
